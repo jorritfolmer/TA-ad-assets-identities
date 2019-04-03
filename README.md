@@ -1,11 +1,12 @@
-# Active Directory assets and identies technical add-on for Splunk
+# Active Directory assets and identities technical add-on for Splunk Enterprise Security
 
 ## What does this add-on do?
 
 This add-on dumps the following categories from Active Directory so you can use it within Splunk Enterprise Security:
-1. Identities
-2. Groups 
-3. Assets
+
+1. Identities (sourcetype ad:identities)
+2. Groups (sourcetype ad:groups)
+3. Assets (sourcetype ad:assets)
 
 ## Why does this add-on exist
 
@@ -16,7 +17,42 @@ To have a fast and reliable way to dump identities, groups and assets from AD in
 1. Install openldap-clients 
 2. Install python-ldap
 3. Install this add-on on a Splunk Enterprise instance (heavy forwarder)
-4. Configure 
+4. Configure, see chapter below
+
+## Configure
+
+![Configure account](appserver/static/TA-ad-accounts.png)
+
+1. Add an LDAP bind account in the Configuration tab of the add-on:
+   * AccountName: e.g. MYDOMAIN_svc_splunk_ldap:
+   * Username: e.g. CN=svc_splunk_ldap,OU=ServiceAccounts,OU=Accounts,DC=mydomain,DC=example
+   * Password: the password of the service account you use to authenticate with
+2. Add a new Identities input in the Inputs tab of the add-on:
+   * Name: e.g. MYDOMAIN_identities
+   * Interval: e.g. 86400, for a daily interval
+   * Index
+   * Account: the account you just added in the Configure tab
+   * Domain controller: IP or FQDN of the domain controller to query
+   * Base DN: e.g: DC=mydomain, DC=example
+   * LDAP attributes: predefined list of attributes to include
+3. Add a new Assets input in the Inputs tab of the add-on:
+   * Name: e.g. MYDOMAIN_assets
+   * Interval: e.g. 86400, for a daily interval
+   * Index
+   * Account: the account you just added in the Configure tab
+   * Domain controller: IP or FQDN of the domain controller to query
+   * Base DN: e.g: DC=mydomain, DC=example
+   * LDAP attributes: predefined list of attributes to include
+4. Add a new Groups input in the Inputs tab of the add-on:
+   * Name: e.g. MYDOMAIN_groups
+   * Interval: e.g. 86400, for a daily interval
+   * Index
+   * Account: the account you just added in the Configure tab
+   * Domain controller: IP or FQDN of the domain controller to query
+   * Base DN: e.g: DC=mydomain, DC=example
+   * LDAP attributes: predefined list of attributes to include
+
+![Configure inputs](appserver/static/screenshot.png)
 
 ## Identities and Splunk Enterprise Security
 
@@ -28,8 +64,8 @@ Identities can appear in events as:
 
 - Windows SID: S-1-5-21-123456789-1234567890-123456789-123456
 - sAMaccoutName: someuser
-- Domain + sAMaccountName: DOMAIN\someuser
-- Kerberos user principal name: someuser@DOMAIN.EXAMPLE
+- Domain + sAMaccountName: MYDOMAIN\someuser
+- Kerberos user principal name: someuser@MYDOMAIN.EXAMPLE
 - Email address: someuser@corpdomain.example
 - Linux UID: 12345
 
@@ -42,7 +78,7 @@ We map Active Directory LDAP attributes to Splunk ES identity attributes as foll
 
 | Splunk ES lookup field | AD ldap attribute |
 |------------------------|-------------------|
-| `identity`             | sAMAccountName, objectSid, userPrincipalName, "DOMAIN" + sAMAccountName, mail, cn, uidNumber |
+| `identity`             | sAMAccountName, objectSid, userPrincipalName, "MYDOMAIN" + sAMAccountName, mail, cn, uidNumber |
 | `first`                | givenName
 | `last`                 | cn
 | `bunit`                | department
@@ -53,7 +89,6 @@ We map Active Directory LDAP attributes to Splunk ES identity attributes as foll
 | `managedBy`            | manager
 | `category`             | TODO
 | `priority`             | TODO, adminCount
-
 
 ### Priority and category
 
@@ -68,7 +103,7 @@ The most practical implementation would be to use OU, because there are only 234
 ### Generating OU list
 
 ```
-index=identities sourcetype=identities:ad
+index=identities sourcetype=ad:identities
 | rex field=dn "(?i)^CN=[^,]+,(?<ou>OU=.+)"
 | stats count by ou
 ```
@@ -93,15 +128,14 @@ This lookup will be used in the lookup generating search below.
 You should schedule this search on the Enterprise Security search head to fill the identity lookup:
 
 ```
-index=identities sourcetype=identities:ad
+index=identities sourcetype=ad:identities
 | rex field=dn ",(?<ou>ou=.+)"
 | rex field=dn "^CN=[^,]+,(?<ou>OU=.+)"
-| eval domain_plus_sAMAccountName=if(sourcetype=="identities:ad", "DOMAIN\\" + sAMAccountName,null())
+| eval domain_plus_sAMAccountName=if(sourcetype=="ad:identities", "MYDOMAIN\\" + sAMAccountName,null())
 | rename givenName AS first, sn AS last, mobile AS phone, mail AS email, l AS work_city, c AS work_country, manager AS managedBy, department AS bunit
 | stats
     latest(dn) as dn,
     latest(uidNumber) as uidNumber,
-    latest(sAMAccountName) as sAMAccountName,
     latest(cn) as cn,
     latest(domain_plus_sAMAccountName) as domain_plus_sAMAccountName,
     latest(userPrincipalName) as userPrincipalName,
