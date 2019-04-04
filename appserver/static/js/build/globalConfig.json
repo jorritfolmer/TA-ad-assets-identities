@@ -232,7 +232,7 @@
                                 }
                             ], 
                             "help": "Comma separated list of LDAP attributes to include", 
-                            "defaultValue": "sAMAccountName, l, department, givenName, manager, sn, mobile, first, last, mail, objectSid, userPrincipalName, memberOf, c, cn, pwdLastSet, lastLogon, badPasswordTime, userAccountControl, description, servicePrincipalName,uidNumber,userWorkstations", 
+                            "defaultValue": "sAMAccountName,l,department,givenName,manager,sn,mobile,first,last,mail,objectSid,userPrincipalName,memberOf,c,cn,pwdLastSet,lastLogon,badPasswordTime,userAccountControl,description,servicePrincipalName,uidNumber,userWorkstations,adminCount", 
                             "field": "ldap_attributes", 
                             "label": "LDAP attributes", 
                             "type": "text", 
@@ -348,7 +348,7 @@
                                 }
                             ], 
                             "help": "Comma separated list of LDAP attributes to include", 
-                            "defaultValue": "cn, description, memberOf, userAccountControl, managedBy, dNSHostName, sAMAccountName, extensionAttribute1, operatingSystem, operatingSystemVersion, whenCreated, whenChanged, pwdLastSet", 
+                            "defaultValue": "cn,description,memberOf,userAccountControl,managedBy,dNSHostName,sAMAccountName,extensionAttribute1,operatingSystem,operatingSystemVersion,whenCreated,whenChanged,pwdLastSet", 
                             "field": "ldap_attributes", 
                             "label": "LDAP attributes", 
                             "type": "text", 
@@ -464,7 +464,7 @@
                                 }
                             ], 
                             "help": "Comma separated list of LDAP attributes to include", 
-                            "defaultValue": "cn, description, member, sAMAccountName", 
+                            "defaultValue": "cn,description,member,sAMAccountName,adminCount", 
                             "field": "ldap_attributes", 
                             "label": "LDAP attributes", 
                             "type": "text", 

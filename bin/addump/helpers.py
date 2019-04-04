@@ -142,6 +142,22 @@ def set_cookie(lc_object, pctrls, pagesize):
         lc_object.controlValue = (pagesize,cookie)
         return cookie
 
+def fix_string_encoding(self, s):
+    encodings = ['utf-8', 'windows-1252', 'latin-1', 'utf16']
+    result = ''
+    success = 0
+    for e in encodings:
+        try:
+            result = s.decode(e).encode('utf-8')
+        except Exception, e:
+            pass
+        else:
+            success = 1
+            break
+    if success == 0:
+        self.helper.log_warning("fix_string_encoding: unable to decode string with %s: %s" % (encodings,s))
+    return result
+
 # This is essentially a placeholder callback function. You would do your real
 # work inside of this. Really this should be all abstracted into a generator...
 def process_entry(dn, attrs):
@@ -161,8 +177,14 @@ def process_entry(dn, attrs):
     for k,v in attrs.items():
         for val in v:
             if type(val) is list:
-                 for val2 in val:
-                     lines += "%s=\"%s\"\n" % (k,val2)
+                for val2 in val:
+                    try:
+                        lines += "%s=\"%s\"\n" % (k,val2)
+                    except Exception, e:
+                        lines += "%s=\"%s\"\n" % (k,fix_string_encoding(val2))
             else:
-                 lines += "%s=\"%s\"\n" % (k,val)
+                try:
+                    lines += "%s=\"%s\"\n" % (k,val)
+                except Exception, e:
+                    lines += "%s=\"%s\"\n" % (k,fix_string_encoding(val))
     return lines
