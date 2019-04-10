@@ -2,7 +2,7 @@
 
 ## What does this add-on do?
 
-This add-on dumps the following categories from Active Directory so you can use it within Splunk Enterprise Security:
+This add-on dumps the following categories from Active Directory so you can use it within Splunk Enterprise Security. 
 
 1. Identities (sourcetype ad:identities)
 2. Groups (sourcetype ad:groups)
@@ -12,14 +12,42 @@ This add-on dumps the following categories from Active Directory so you can use 
 
 To have a fast and reliable way to dump identities, groups and assets from AD into Splunk. Dumping 100k accounts takes just 30 seconds.
 
-## How do I use this add-on?
+## Supported Splunk versions and platforms
+
+This add-on only works on Linux because of the dependency on python-ldap and openldap 2.x libraries that do not exist on Windows.
+
+| Splunk version | Linux | Windows
+|----------------|-------|---------
+| 6.3            | Yes   | No
+| 6.4            | Yes   | No
+| 6.5            | Yes   | No
+| 6.6            | Yes   | No
+| 7.0            | Yes   | No
+| 7.1            | Yes   | No
+| 7.2            | Yes   | No
+
+## How do I install this add-on?
 
 1. Install openldap-clients 
 2. Install python-ldap
-3. Install this add-on on a Splunk Enterprise instance (heavy forwarder)
-4. Configure, see chapter below
+3. Install this add-on on a Splunk Enterprise instance, see single instance or distributed deployment below
+4. Configure, see Configuration chapter 
 
-## Configure
+### Single instance Splunk deployments
+
+1. In Splunk, click on "Manage Apps"
+2. Click "Browse more apps", search for "TA-ad-assets-identities" and install the add-on
+
+### Distributed Splunk deployments
+
+| Instance type | Supported | Required | Description
+|---------------|-----------|----------|------------
+| Search head   | Yes       | Yes      | Install this add-on on your search head(s) for proper field extraction of AD assets and identities
+| Indexer       | Yes       | No       | This add-on should be installed on a heavy forwarder that does the index time parsingand event breaking. There is no need to install this add-on on an indexer too.
+| Universal Forwarder | No  | No       | This add-on is not supported on a Universal Forwarder because it requires Python
+| Heavy Forwarder     | Yes | Yes      | Install this add-on on a heavy forwarder to ingest DMARC XML aggregate reports into Splunk.
+
+## Configuration
 
 ![Configure account](appserver/static/TA-ad-accounts.png)
 
@@ -75,7 +103,6 @@ All these fields have to be present in the `identity` multivalue field of the Sp
 
 We map Active Directory LDAP attributes to Splunk ES identity attributes as follows:
  
-
 | Splunk ES lookup field | AD ldap attribute |
 |------------------------|-------------------|
 | `identity`             | sAMAccountName, objectSid, userPrincipalName, "MYDOMAIN" + sAMAccountName, mail, cn, uidNumber |

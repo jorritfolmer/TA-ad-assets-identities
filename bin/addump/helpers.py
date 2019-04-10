@@ -3,7 +3,7 @@ sys.path.append('/usr/lib64/python2.7/site-packages')
 try:
     import ldap
 except Exception:
-    raise ValueError("Error importing system ldap librabry")
+    raise ValueError("Error importing system ldap library. Install openldap and python-ldap.")
 import struct
 from ldap.controls import SimplePagedResultsControl
 from distutils.version import StrictVersion
@@ -142,7 +142,7 @@ def set_cookie(lc_object, pctrls, pagesize):
         lc_object.controlValue = (pagesize,cookie)
         return cookie
 
-def fix_string_encoding(self, s):
+def fix_string_encoding(helper, s):
     encodings = ['utf-8', 'windows-1252', 'latin-1', 'utf16']
     result = ''
     success = 0
@@ -155,12 +155,12 @@ def fix_string_encoding(self, s):
             success = 1
             break
     if success == 0:
-        self.helper.log_warning("fix_string_encoding: unable to decode string with %s: %s" % (encodings,s))
+        helper.log_warning("fix_string_encoding: unable to decode string with %s: %s" % (encodings,s))
     return result
 
 # This is essentially a placeholder callback function. You would do your real
 # work inside of this. Really this should be all abstracted into a generator...
-def process_entry(dn, attrs):
+def process_entry(helper, dn, attrs):
     """Process an entry. The two arguments passed are the DN and
        a dictionary of attributes."""
     if 'objectSid' in attrs:
@@ -181,10 +181,10 @@ def process_entry(dn, attrs):
                     try:
                         lines += "%s=\"%s\"\n" % (k,val2)
                     except Exception, e:
-                        lines += "%s=\"%s\"\n" % (k,fix_string_encoding(val2))
+                        lines += "%s=\"%s\"\n" % (k,fix_string_encoding(helper, val2))
             else:
                 try:
                     lines += "%s=\"%s\"\n" % (k,val)
                 except Exception, e:
-                    lines += "%s=\"%s\"\n" % (k,fix_string_encoding(val))
+                    lines += "%s=\"%s\"\n" % (k,fix_string_encoding(helper, val))
     return lines

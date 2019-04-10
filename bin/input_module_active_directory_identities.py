@@ -1,4 +1,3 @@
-
 # encoding = utf-8
 
 import os
@@ -9,7 +8,7 @@ sys.path.append('/usr/lib64/python2.7/site-packages')
 try:
     import ldap
 except Exception:
-    raise ValueError("Error importing system ldap librabry")
+    raise ValueError("Error importing system ldap library. Install openldap and python-ldap.")
 import struct
 from ldap.controls import SimplePagedResultsControl
 from distutils.version import StrictVersion
@@ -59,7 +58,8 @@ def collect_events(helper, ew):
     try:
         l.simple_bind_s(opt_global_account['username'], opt_global_account['password'])
     except ldap.LDAPError as e:
-        exit('LDAP bind failed: %s' % e)
+        helper.log_error('LDAP bind failed: %s' % e)
+        exit(1)
     
     lc = addump.helpers.create_controls(opt_pagesize)
     
@@ -69,16 +69,18 @@ def collect_events(helper, ew):
             msgid = l.search_ext(opt_base_dn, ldap.SCOPE_SUBTREE, "(&(objectclass=user)(!(objectclass=computer)))",
                                  opt_ldap_attributes, serverctrls=[lc])
         except ldap.LDAPError as e:
-            sys.exit('LDAP search failed: %s' % e)
+            helper.log_error('LDAP search failed: %s' % e)
+            break
     
         try:
             rtype, rdata, rmsgid, serverctrls = l.result3(msgid)
         except ldap.LDAPError as e:
-            sys.exit('Could not pull LDAP results: %s' % e)
+            helper.log_error('Could not pull LDAP results: %s' % e)
+            break
     
         for dn, attrs in rdata:
             if dn is not None:
-                data = addump.helpers.process_entry(dn, attrs)
+                data = addump.helpers.process_entry(helper, dn, attrs)
                 event = helper.new_event(data, time=None, host=None, index=None, source=None, sourcetype=None, done=True, unbroken=True)
                 ew.write_event(event)
     
