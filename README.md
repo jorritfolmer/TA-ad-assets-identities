@@ -193,3 +193,24 @@ index=identities sourcetype=ad:identities
 | outputlookup my_ad_identities
 ```
 
+## Troubleshooting
+
+These commands should exit succesfully:
+
+```
+bash-4.2$ cd /opt/splunk/etc/apps/TA-ad-assets-identities/bin
+bash-4.2$ /opt/splunk/bin/splunk cmd python input_module_active_directory_identities.py
+bash-4.2$ echo $?
+0
+```
+
+If for example python-ldap is not installed you will get the following error:
+
+````
+bash-4.2$ /opt/splunk/bin/splunk cmd python input_module_active_directory_assets.py
+Traceback (most recent call last):
+  File "input_module_active_directory_assets.py", line 12, in <module>
+    raise ValueError("Error importing system ldap librabry")
+ValueError: Error importing system ldap library
+````
+

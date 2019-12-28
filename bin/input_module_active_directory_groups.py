@@ -9,7 +9,7 @@ sys.path.append('/usr/lib64/python2.7/site-packages')
 try:
     import ldap
 except Exception:
-    raise ValueError("Error importing system ldap librabry")
+    raise ValueError("Error importing system ldap library")
 import struct
 from ldap.controls import SimplePagedResultsControl
 from distutils.version import StrictVersion
