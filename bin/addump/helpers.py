@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 import sys
 sys.path.append('/usr/lib64/python2.7/site-packages')
 try:
@@ -87,13 +90,13 @@ def sid2string(binary):
     string = 'S-%d-%d' % (version, authority)
     binary = binary[8:]
     assert len(binary) == 4 * length
-    for i in xrange(length):
+    for i in range(length):
         value = struct.unpack('<L', binary[4*i:4*(i+1)])[0]
         string += '-%d' % (value)
     return string
 
 def ad_time_to_seconds(ad_time):
-    return -(int(ad_time) / 10000000)
+    return -(old_div(int(ad_time), 10000000))
 
 def ad_seconds_to_unix(ad_seconds):
     return  ((int(ad_seconds) + 11644473600) if int(ad_seconds) != 0 else 0)
@@ -149,7 +152,7 @@ def fix_string_encoding(helper, s):
     for e in encodings:
         try:
             result = s.decode(e).encode('utf-8')
-        except Exception, e:
+        except Exception as e:
             pass
         else:
             success = 1
@@ -174,17 +177,17 @@ def process_entry(helper, dn, attrs):
     if 'userAccountControl' in attrs:
         attrs['userAccountControl'] = [uac2flag(attrs['userAccountControl'][0])]
     lines = "dn=\"%s\"\n" % dn
-    for k,v in attrs.items():
+    for k,v in list(attrs.items()):
         for val in v:
             if type(val) is list:
                 for val2 in val:
                     try:
                         lines += "%s=\"%s\"\n" % (k,val2)
-                    except Exception, e:
+                    except Exception as e:
                         lines += "%s=\"%s\"\n" % (k,fix_string_encoding(helper, val2))
             else:
                 try:
                     lines += "%s=\"%s\"\n" % (k,val)
-                except Exception, e:
+                except Exception as e:
                     lines += "%s=\"%s\"\n" % (k,fix_string_encoding(helper, val))
     return lines

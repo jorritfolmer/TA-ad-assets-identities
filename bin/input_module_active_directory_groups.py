@@ -1,5 +1,6 @@
 # encoding = utf-8
 
+from builtins import str
 import os
 import sys
 import time

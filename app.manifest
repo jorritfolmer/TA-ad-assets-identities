@@ -1,11 +1,11 @@
 {
   "schemaVersion": "1.0.0",
   "info": {
-    "title": "Active Directory asset and identities",
+    "title": "Active Directory assets and identities add-on for Splunk",
     "id": {
       "group": null,
       "name": "TA-ad-assets-identities",
-      "version": "1.0.1"
+      "version": "1.1.0"
     },
     "author": [
       {

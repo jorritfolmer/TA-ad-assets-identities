@@ -11,6 +11,7 @@ This add-on dumps the following categories from Active Directory so you can use 
 ## Why does this add-on exist
 
 To have a fast and reliable way to dump identities, groups and assets from AD into Splunk. Dumping 100k accounts takes just 30 seconds.
+This add-on is not available on Splunkbase unfortunately due to the OS dependent openldap library that it uses.
 
 ## Supported Splunk versions and platforms
 
@@ -25,6 +26,8 @@ This add-on only works on Linux because of the dependency on python-ldap and ope
 | 7.0            | Yes   | No
 | 7.1            | Yes   | No
 | 7.2            | Yes   | No
+| 7.3            | Yes   | No
+| 8.0            | Yes   | No
 
 ## How do I install this add-on?
 
@@ -35,8 +38,14 @@ This add-on only works on Linux because of the dependency on python-ldap and ope
 
 ### Single instance Splunk deployments
 
-1. In Splunk, click on "Manage Apps"
-2. Click "Browse more apps", search for "TA-ad-assets-identities" and install the add-on
+1. cd /opt/splunk/etc/apps
+2. git clone https://github.com/jorritfolmer/TA-ad-assets-identities.git
+
+Or
+
+1. cd /opt/splunk/etc/apps
+1. Download and unzip the .zip file
+1. mv TA-ad-assets-identities-master TA-ad-assets-identities-master
 
 ### Distributed Splunk deployments
 
@@ -45,7 +54,7 @@ This add-on only works on Linux because of the dependency on python-ldap and ope
 | Search head   | Yes       | Yes      | Install this add-on on your search head(s) for proper field extraction of AD assets and identities
 | Indexer       | Yes       | No       | This add-on should be installed on a heavy forwarder that does the index time parsingand event breaking. There is no need to install this add-on on an indexer too.
 | Universal Forwarder | No  | No       | This add-on is not supported on a Universal Forwarder because it requires Python
-| Heavy Forwarder     | Yes | Yes      | Install this add-on on a heavy forwarder to ingest DMARC XML aggregate reports into Splunk.
+| Heavy Forwarder     | Yes | Yes      | Install this add-on on a heavy forwarder 
 
 ## Configuration
 
